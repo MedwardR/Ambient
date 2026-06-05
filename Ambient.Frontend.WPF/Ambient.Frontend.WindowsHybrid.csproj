@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Kernel\Ambient.Kernel.csproj" />
+	  <ProjectReference Include="..\Ambient.Kernel\Ambient.Kernel.csproj" />
 	</ItemGroup>
 
 </Project>
