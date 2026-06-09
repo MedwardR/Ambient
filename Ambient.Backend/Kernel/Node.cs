@@ -2,5 +2,5 @@
 
 public abstract class Node
 {
-	public virtual void Update(float deltaTime) { }
+	public abstract void Update(float deltaTime);
 }

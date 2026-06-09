@@ -1,20 +1,20 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using Ambient.Backend.Features;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public class VectorGraphic : WindowsGraphic
+public sealed class VectorGraphic : WindowsGraphic
 {
 	public Canvas Canvas { get; }
 
 	public VectorGraphic(LinearTransform transform) : base(transform)
 	{
+		Title = "Ambient Vector Graphic";
 		Canvas = new()
 		{
 			Background = Brushes.Transparent,
 		};
-		Window.Content = Canvas;
+		GraphicElement = Canvas;
 	}
 }

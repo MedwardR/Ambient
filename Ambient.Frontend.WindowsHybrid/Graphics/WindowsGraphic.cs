@@ -1,25 +1,28 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
 using Ambient.Backend.Features;
+using Ambient.Backend.Mathematics;
+using Ambient.Frontend.WindowsHybrid.Utilities;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public abstract class WindowsGraphic
+public abstract class WindowsGraphic : IDisposable
 {
-	protected LinearTransform Transform { get; }
+	public FrameworkElement? GraphicElement { get; init; }
+
+	protected LinearTransform NodeTransform { get; }
+	protected MatrixTransform RenderTransform { get; }
 	protected Window Window { get; }
+
+	protected bool AllowClosing { get; set; }
 
 	public string Title
 	{
 		get => Window.Title;
 		set => Window.Title = value;
-	}
-
-	public Brush Background
-	{
-		get => Window.Background;
-		set => Window.Background = value;
 	}
 
 	public bool Visible
@@ -30,24 +33,97 @@ public abstract class WindowsGraphic
 
 	public WindowsGraphic(LinearTransform transform)
 	{
-		Transform = transform;
+		var matrix = GetRenderMatrix(transform);
+
+		NodeTransform = transform;
+		RenderTransform = new(matrix);
 		Window = new()
 		{
-			Title = "Ambient Raster Graphic",
-			Width = 400,
-			Height = 400,
+			Title = "Ambient Windows Graphic",
 			WindowStyle = WindowStyle.None,
 
 			AllowsTransparency = true,
 			Background = Brushes.Transparent,
+			ResizeMode = ResizeMode.NoResize,
 			Visibility = Visibility.Visible,
 		};
+		AllowClosing = false;
+
 		CompositionTarget.Rendering += OnRendering;
+		Window.Closing += OnClosing;
 	}
 
 	protected virtual void OnRendering(object? sender, EventArgs e)
 	{
-		Window.Left = Transform.Position.X - Window.Width / 2.0;
-		Window.Top = Transform.Position.Y - Window.Height / 2.0;
+		if (!ReferenceEquals(Window.Content, GraphicElement))
+		{
+			Window.Content = GraphicElement;
+		}
+		if (GraphicElement is not null)
+		{
+			var transform = NodeTransform;
+			var matrix = GetRenderMatrix(transform);
+
+			if (matrix != RenderTransform.Matrix)
+			{
+				RenderTransform.Matrix = matrix;
+			}
+			if (!ReferenceEquals(GraphicElement.RenderTransform, RenderTransform))
+			{
+				GraphicElement.RenderTransform = RenderTransform;
+				GraphicElement.RenderTransformOrigin = new Point(0.5, 0.5);
+			}
+			if (Window.ActualWidth > 0.0 && Window.ActualHeight > 0.0)
+			{
+				Window.Left = transform.Position.X - Window.ActualWidth / 2.0;
+				Window.Top = transform.Position.Y - Window.ActualHeight / 2.0;
+
+				float length = GraphicElement.GetActualSize().Length();
+				float scale = MathF.Max(
+					MathF.Abs(transform.Scale.X),
+					MathF.Abs(transform.Scale.Y)
+				);
+				Window.Width = length * scale;
+				Window.Height = length * scale;
+			}
+		}
+	}
+
+	protected virtual void OnClosing(object? sender, CancelEventArgs e)
+	{
+		if (!AllowClosing)
+		{
+			e.Cancel = true;
+		}
+	}
+
+	protected static Matrix GetRenderMatrix(LinearTransform transform)
+	{
+		var m = Matrix.Identity;
+
+		if (transform.Scale != Vector2.One)
+		{
+			m.Scale(transform.Scale.X, transform.Scale.Y);
+		}
+		if (transform.Rotation != Angle.Zero)
+		{
+			m.Rotate(transform.Rotation.Degrees);
+		}
+		return m;
+	}
+
+	public void Dispose()
+	{
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
+		{
+			AllowClosing = true;
+			Window.Close();
+		}
 	}
 }
