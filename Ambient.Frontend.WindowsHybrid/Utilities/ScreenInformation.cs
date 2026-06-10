@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Windows.Forms;
 
-namespace Ambient.Frontend.WindowsHybrid.Input;
+namespace Ambient.Frontend.WindowsHybrid.Utilities;
 
 public static class ScreenInformation
 {

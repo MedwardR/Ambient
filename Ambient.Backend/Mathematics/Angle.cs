@@ -2,7 +2,7 @@
 
 namespace Ambient.Backend.Mathematics;
 
-public readonly struct Angle
+public readonly record struct Angle
 {
 	public readonly float Degrees;
 	public readonly float Radians;
@@ -43,30 +43,6 @@ public readonly struct Angle
 	public static float RadiansToDegrees(float radians)
 	{
 		return radians * (180f / MathF.PI);
-	}
-
-	public override bool Equals(object? obj)
-	{
-		if (obj is Angle angle)
-		{
-			return Degrees == angle.Degrees && Radians == angle.Radians;
-		}
-		return false;
-	}
-
-	public override int GetHashCode()
-	{
-		return HashCode.Combine(Degrees, Radians);
-	}
-
-	public static bool operator ==(Angle left, Angle right)
-	{
-		return left.Equals(right);
-	}
-
-	public static bool operator !=(Angle left, Angle right)
-	{
-		return !left.Equals(right);
 	}
 
 	public static Angle operator +(Angle left, Angle right)
