@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using Ambient.Backend.Features;
 using Ambient.Backend.Mathematics;
-using Ambient.Frontend.WindowsHybrid.Utilities;
+using Ambient.Frontend.WindowsHybrid.Extensions;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
@@ -39,7 +39,7 @@ public abstract class WindowsGraphic : IDisposable
 		RenderTransform = new(matrix);
 		Window = new()
 		{
-			Title = "Ambient Windows Graphic",
+			Title = "Ambient Graphic",
 			WindowStyle = WindowStyle.None,
 
 			AllowsTransparency = true,
@@ -101,13 +101,19 @@ public abstract class WindowsGraphic : IDisposable
 	{
 		var m = Matrix.Identity;
 
-		if (transform.Scale != Vector2.One)
+		if (transform.Scale != Vector2.One || transform.FlipX || transform.FlipY)
 		{
-			m.Scale(transform.Scale.X, transform.Scale.Y);
+			double x = transform.FlipX ? -transform.Scale.X : transform.Scale.X;
+			double y = transform.FlipY ? -transform.Scale.Y : transform.Scale.Y;
+
+			m.Scale(x, y);
 		}
-		if (transform.Rotation != Angle.Zero)
+		if (transform.Rotation != Angle.Zero || transform.FlipX || transform.FlipY)
 		{
-			m.Rotate(transform.Rotation.Degrees);
+			double degrees = transform.Rotation.Degrees;
+			double angle = transform.FlipX ? degrees + 180.0 : degrees;
+
+			m.Rotate(angle);
 		}
 		return m;
 	}

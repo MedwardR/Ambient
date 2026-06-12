@@ -8,12 +8,12 @@ public sealed class RasterGraphic : WindowsGraphic
 {
 	public Image Image { get; }
 
-	public RasterGraphic(LinearTransform transform) : base(transform)
+	public RasterGraphic(Sprite sprite, LinearTransform transform) : base(transform)
 	{
 		Title = "Ambient Raster Graphic";
 		Image = new()
 		{
-			Source = null,
+			Source = sprite.Source,
 			Stretch = Stretch.None,
 		};
 		RenderOptions.SetBitmapScalingMode(

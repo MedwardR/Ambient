@@ -4,10 +4,7 @@ using Ambient.Backend.Mathematics;
 namespace Ambient.Backend.Features;
 
 /// <summary>
-/// Represents the
-/// <see href="https://en.wikipedia.org/wiki/Transformation_(function)">
-/// position, rotation, and scale</see>
-/// of an object.
+/// Represents the position, rotation, and scale of an object.
 /// </summary>
 public class LinearTransform
 {
@@ -17,7 +14,7 @@ public class LinearTransform
 	public Vector2 Position { get; set; } = Vector2.Zero;
 
 	/// <summary>
-	/// The object's rotation around it's z-axis (defaults to <see cref="Angle.Zero"/>).
+	/// The object's rotation around its Z-axis (defaults to <see cref="Angle.Zero"/>).
 	/// </summary>
 	public Angle Rotation { get; set; } = Angle.Zero;
 
@@ -27,14 +24,12 @@ public class LinearTransform
 	public Vector2 Scale { get; set; } = Vector2.One;
 
 	/// <summary>
-	/// Mirrors the object across the specified axes by inverting
-	/// one or both components of the scale property.
+	/// Determines if the object's X-axis should be inverted.
 	/// </summary>
-	public void Flip(Axis axis)
-	{
-		float x = axis.HasFlag(Axis.X) ? -Scale.X : Scale.X;
-		float y = axis.HasFlag(Axis.Y) ? -Scale.Y : Scale.Y;
+	public bool FlipX { get; set; }
 
-		Scale = new(x, y);
-	}
+	/// <summary>
+	/// Determines if the object's Y-axis should be inverted.
+	/// </summary>
+	public bool FlipY { get; set; }
 }

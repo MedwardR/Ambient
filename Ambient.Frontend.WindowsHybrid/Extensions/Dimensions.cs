@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Windows;
 
-namespace Ambient.Frontend.WindowsHybrid.Utilities;
+namespace Ambient.Frontend.WindowsHybrid.Extensions;
 
 public static class Dimensions
 {

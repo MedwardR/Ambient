@@ -12,12 +12,10 @@ public class World
 	private readonly Thread _updateThread;
 	private volatile bool _running;
 
-	protected List<Node> _nodes;
-
 	/// <summary>
 	/// The collection of nodes to be enumerated during the update cycle.
 	/// </summary>
-	public IReadOnlyList<Node> Nodes => _nodes;
+	public List<Node> Nodes { get; }
 
 	/// <summary>
 	/// A number indicating the ideal frame rate of the update cycle (60 by default).
@@ -32,18 +30,9 @@ public class World
 			IsBackground = true,
 		};
 		_running = false;
-		_nodes = [];
 
+		Nodes = [];
 		FramesPerSecond = 60.0;
-	}
-
-	/// <summary>
-	/// Adds a node to be enumerated during the update cycle.
-	/// </summary>
-	public void AddNode(Node item)
-	{
-		item.Root = this;
-		_nodes.Add(item);
 	}
 
 	/// <summary>
