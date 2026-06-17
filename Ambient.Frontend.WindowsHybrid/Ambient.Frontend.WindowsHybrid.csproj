@@ -11,27 +11,9 @@
 	<PropertyGroup>
 		<Title>Ambient Engine ~ Backend</Title>
 		<Authors>MedwardR</Authors>
-		<PackageIcon>128.png</PackageIcon>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/MedwardR/Ambient/</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageLicenseFile>UNLICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Include="..\Icon\128.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\UNLICENSE.txt">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Ambient.Backend\Ambient.Backend.csproj" />

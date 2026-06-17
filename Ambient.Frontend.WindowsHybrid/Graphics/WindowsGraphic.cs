@@ -3,8 +3,7 @@ using System.ComponentModel;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
-using Ambient.Backend.Features;
-using Ambient.Backend.Mathematics;
+using Ambient.Backend.Geometry;
 using Ambient.Frontend.WindowsHybrid.Extensions;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
@@ -12,12 +11,11 @@ namespace Ambient.Frontend.WindowsHybrid.Graphics;
 public abstract class WindowsGraphic : IDisposable
 {
 	public FrameworkElement? GraphicElement { get; init; }
+	public bool AllowClosing { get; set; }
 
 	protected LinearTransform NodeTransform { get; }
 	protected MatrixTransform RenderTransform { get; }
 	protected Window Window { get; }
-
-	protected bool AllowClosing { get; set; }
 
 	public string Title
 	{
@@ -47,7 +45,7 @@ public abstract class WindowsGraphic : IDisposable
 			ResizeMode = ResizeMode.NoResize,
 			Visibility = Visibility.Visible,
 		};
-		AllowClosing = false;
+		AllowClosing = true;
 
 		CompositionTarget.Rendering += OnRendering;
 		Window.Closing += OnClosing;
@@ -57,6 +55,9 @@ public abstract class WindowsGraphic : IDisposable
 	{
 		if (!ReferenceEquals(Window.Content, GraphicElement))
 		{
+			GraphicElement?.HorizontalAlignment = HorizontalAlignment.Center;
+			GraphicElement?.VerticalAlignment = VerticalAlignment.Center;
+
 			Window.Content = GraphicElement;
 		}
 		if (GraphicElement is not null)
@@ -71,7 +72,7 @@ public abstract class WindowsGraphic : IDisposable
 			if (!ReferenceEquals(GraphicElement.RenderTransform, RenderTransform))
 			{
 				GraphicElement.RenderTransform = RenderTransform;
-				GraphicElement.RenderTransformOrigin = new Point(0.5, 0.5);
+				GraphicElement.RenderTransformOrigin = new(0.5, 0.5);
 			}
 			if (Window.ActualWidth > 0.0 && Window.ActualHeight > 0.0)
 			{
@@ -89,14 +90,6 @@ public abstract class WindowsGraphic : IDisposable
 		}
 	}
 
-	protected virtual void OnClosing(object? sender, CancelEventArgs e)
-	{
-		if (!AllowClosing)
-		{
-			e.Cancel = true;
-		}
-	}
-
 	protected static Matrix GetRenderMatrix(LinearTransform transform)
 	{
 		var m = Matrix.Identity;
@@ -110,12 +103,17 @@ public abstract class WindowsGraphic : IDisposable
 		}
 		if (transform.Rotation != Angle.Zero || transform.FlipX || transform.FlipY)
 		{
-			double degrees = transform.Rotation.Degrees;
-			double angle = transform.FlipX ? degrees + 180.0 : degrees;
-
-			m.Rotate(angle);
+			m.Rotate(transform.Rotation.Degrees);
 		}
 		return m;
+	}
+
+	protected virtual void OnClosing(object? sender, CancelEventArgs e)
+	{
+		if (!AllowClosing)
+		{
+			e.Cancel = true;
+		}
 	}
 
 	public void Dispose()

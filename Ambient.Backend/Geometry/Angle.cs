@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Ambient.Backend.Mathematics;
+namespace Ambient.Backend.Geometry;
 
 public readonly record struct Angle
 {

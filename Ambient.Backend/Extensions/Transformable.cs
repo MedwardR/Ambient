@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Ambient.Backend.Contracts;
-using Ambient.Backend.Mathematics;
+using Ambient.Backend.Geometry;
 
 namespace Ambient.Backend.Extensions;
 

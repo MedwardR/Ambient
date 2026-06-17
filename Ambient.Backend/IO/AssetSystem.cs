@@ -1,16 +1,19 @@
 ﻿using System.Collections.Concurrent;
 using Ambient.Backend.Contracts;
-using Ambient.Backend.Kernel;
 
 namespace Ambient.Backend.IO;
 
-public class AssetSystem(string? root = default) : Node
+public class AssetSystem
 {
 	protected readonly ConcurrentDictionary<string, byte[]> _cache = [];
 
 	protected static string ApplicationRoot { get; } = AppContext.BaseDirectory;
 
-	public string AssetsRoot { get; init; } = root ?? string.Empty;
+	public string AssetsRoot { get; init; }
+
+	public AssetSystem() => AssetsRoot = string.Empty;
+
+	public AssetSystem(string root) => AssetsRoot = root;
 
 	public T LoadAsset<T>(string path) where T : IAsset, new()
 	{
@@ -23,11 +26,18 @@ public class AssetSystem(string? root = default) : Node
 		return asset;
 	}
 
-	public virtual string Resolve(string path)
+	public virtual string Resolve(string relativePath)
 	{
-		string normalized = path.Replace('\\', '/');
+		string normalized = relativePath.Replace('\\', '/');
 		string combined = Path.Combine(ApplicationRoot, AssetsRoot, normalized);
+		string path = Path.GetFullPath(combined);
 
-		return Path.GetFullPath(combined);
+		if (File.Exists(path))
+		{
+			return path;
+		}
+		else throw new FileNotFoundException($"Asset file not found: '{path}'", path);
 	}
+
+	public virtual void Clear() => _cache.Clear();
 }

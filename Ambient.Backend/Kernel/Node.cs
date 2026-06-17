@@ -1,16 +1,22 @@
-﻿namespace Ambient.Backend.Kernel;
+﻿using Ambient.Backend.Threading;
 
-/// <summary>
-/// An individual element designed to exist as part of a greater ecosystem.
-/// </summary>
+namespace Ambient.Backend.Kernel;
+
 public abstract class Node
 {
-	/// <summary>
-	/// Processes updates for the current node, using <paramref name="deltaTime"/>
-	/// to remain frame-rate independent.
-	/// </summary>
-	/// <param name="deltaTime">
-	/// The amount of time since the last update, in seconds.
-	/// </param>
+	public List<Node> Nodes { get; } = [];
+
+	internal void UpdateInternal(float deltaTime, SyncSystem sync)
+	{
+		foreach (var n in Nodes)
+		{
+			n.UpdateInternal(deltaTime, sync);
+		}
+		Update(deltaTime);
+		Update(deltaTime, sync);
+	}
+
 	public virtual void Update(float deltaTime) { }
+
+	public virtual void Update(float deltaTime, SyncSystem sync) { }
 }

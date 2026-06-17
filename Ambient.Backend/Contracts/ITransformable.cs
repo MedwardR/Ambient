@@ -1,4 +1,4 @@
-﻿using Ambient.Backend.Features;
+﻿using Ambient.Backend.Geometry;
 
 namespace Ambient.Backend.Contracts;
 
