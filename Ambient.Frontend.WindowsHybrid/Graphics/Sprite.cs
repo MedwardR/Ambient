@@ -1,17 +1,16 @@
 ﻿using System.IO;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Ambient.Backend.Contracts;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public class Sprite : ISprite<ImageSource>, IAsset
+public class Sprite : ISprite<BitmapSource>, IAsset
 {
 	protected BitmapImage? _initialImage;
 	protected BitmapSource _bitmapSource;
 
-	public ImageSource Source => _bitmapSource;
+	public BitmapSource Source => _bitmapSource;
 
 	public Sprite()
 	{
@@ -39,7 +38,7 @@ public class Sprite : ISprite<ImageSource>, IAsset
 		image.Freeze();
 
 		_initialImage = null;
-		_bitmapSource = image;
+		_bitmapSource = Normalize(image);
 	}
 
 	public Sprite[] Split(int frameWidth, int frameHeight)
@@ -62,5 +61,44 @@ public class Sprite : ISprite<ImageSource>, IAsset
 			}
 		}
 		return frames;
+	}
+
+	public static BitmapSource Normalize(BitmapSource source)
+	{
+		const double DPI = 96.0;
+
+		if (source.DpiX != DPI || source.DpiY != DPI)
+		{
+			var normalized = BitmapSource.Create(
+				source.PixelWidth,
+				source.PixelHeight,
+				DPI,
+				DPI,
+				source.Format,
+				source.Palette,
+				GetPixels(source),
+				GetStride(source)
+			);
+			normalized.Freeze();
+
+			return normalized;
+		}
+		else return source;
+	}
+
+	public static byte[] GetPixels(BitmapSource source)
+	{
+		int stride = GetStride(source);
+		byte[] pixels = new byte[stride * source.PixelHeight];
+
+		source.CopyPixels(pixels, stride, 0);
+
+		return pixels;
+	}
+
+	private static int GetStride(BitmapSource source)
+	{
+		int bytesPerPixel = (source.Format.BitsPerPixel + 7) / 8;
+		return source.PixelWidth * bytesPerPixel;
 	}
 }

@@ -4,7 +4,7 @@ using Ambient.Backend.Geometry;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public sealed class RasterGraphic : WindowsGraphic
+public class RasterGraphic : WindowsGraphic
 {
 	public Image Image { get; }
 
@@ -14,7 +14,8 @@ public sealed class RasterGraphic : WindowsGraphic
 		Image = new()
 		{
 			Source = null,
-			Stretch = Stretch.Fill,
+			Stretch = Stretch.None,
+			SnapsToDevicePixels = true,
 		};
 		RenderOptions.SetBitmapScalingMode(
 			Image,
@@ -22,4 +23,6 @@ public sealed class RasterGraphic : WindowsGraphic
 		);
 		GraphicElement = Image;
 	}
+
+	public void Use(Sprite sprite) => Image.Source = sprite.Source;
 }

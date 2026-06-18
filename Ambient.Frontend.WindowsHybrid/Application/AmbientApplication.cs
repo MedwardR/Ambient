@@ -63,23 +63,12 @@ public class AmbientApplication : System.Windows.Application
 	{
 		try
 		{
+			World.StopThread();
 			TrayIcon.Dispose();
 		}
 		finally
 		{
 			Shutdown();
-		}
-	}
-
-	protected override void OnExit(ExitEventArgs e)
-	{
-		try
-		{
-			World.StopThread();
-		}
-		finally
-		{
-			base.OnExit(e);
 		}
 	}
 }
