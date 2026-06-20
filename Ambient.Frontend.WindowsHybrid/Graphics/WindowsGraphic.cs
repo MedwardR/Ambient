@@ -2,7 +2,9 @@
 using System.ComponentModel;
 using System.Numerics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
+using Ambient.Backend.Diagnostics;
 using Ambient.Backend.Geometry;
 using Ambient.Frontend.WindowsHybrid.Extensions;
 
@@ -10,12 +12,13 @@ namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
 public abstract class WindowsGraphic : IDisposable
 {
-	public FrameworkElement? GraphicElement { get; init; }
-	public bool AllowClosing { get; set; }
-
 	protected LinearTransform NodeTransform { get; }
 	protected MatrixTransform RenderTransform { get; }
 	protected Window Window { get; }
+
+	protected FrameworkElement? GraphicElement { get; init; }
+
+	public bool AllowClosing { get; set; }
 
 	public string Title
 	{
