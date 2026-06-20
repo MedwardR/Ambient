@@ -6,23 +6,44 @@ using Ambient.Backend.Threading;
 
 namespace Ambient.Backend.Animation;
 
-public class Animator<T>() : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
+public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 {
-	protected bool _running = false;
-	protected Dictionary<string, KeyFrame<T>[]> _animations = new(StringComparer.OrdinalIgnoreCase);
+	protected Dictionary<string, KeyFrame<T>[]> _animations;
 
+	protected bool _switched;
 	protected string? _current;
-	protected KeyFrame<T>[] _frames = [];
+	protected KeyFrame<T>[] _frames;
 
-	protected int _frameIndex = 0;
-	protected float _frameSeconds = 0f;
+	protected bool _running;
+	protected int _frameIndex;
+	protected float _frameSeconds;
+
+	private const string EMPTY_NAME_EX = "Animation name cannot be empty";
+	private const string ZERO_FRAMES_EX = "Animation must have at least one frame";
 
 	public event EventHandler<KeyFrameEventArgs<T>>? FrameChanged;
 
-	public bool Looping { get; set; } = true;
-	public int FrameIndex => _frameIndex;
+	public bool Looping { get; set; }
 
-	public KeyFrame<T> Frame() => _frames[_frameIndex];
+	public string? Current => _current;
+	public int FrameIndex => _frameIndex;
+	public KeyFrame<T> Frame => _frames[_frameIndex];
+
+	public Animator()
+	{
+		var comparer = StringComparer.OrdinalIgnoreCase;
+
+		_animations = new(comparer);
+		_switched = false;
+		_current = null;
+		_frames = [];
+
+		_running = false;
+		_frameIndex = 0;
+		_frameSeconds = 0f;
+
+		Looping = true;
+	}
 
 	public void Start() => _running = true;
 
@@ -44,41 +65,54 @@ public class Animator<T>() : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 
 	public void Add(string animation, KeyFrame<T>[] frames)
 	{
-		if (_current is null)
+		if (string.IsNullOrWhiteSpace(animation))
 		{
-			_current = animation;
-			_frames = frames;
+			throw new ArgumentException(EMPTY_NAME_EX, nameof(animation));
 		}
-		_animations.Add(animation, frames);
+		else if (frames.Length > 0)
+		{
+			string trimmed = animation.Trim();
+
+			if (_current is null)
+			{
+				UseInternal(trimmed, frames);
+			}
+			_animations.Add(trimmed, frames);
+		}
+		else throw new ArgumentException(ZERO_FRAMES_EX, nameof(frames));
 	}
 
 	public void Use(string animation)
 	{
-		var trimmed = animation.Trim();
+		string trimmed = animation.Trim();
 
-		if (!string.Equals(_current, trimmed, StringComparison.OrdinalIgnoreCase))
+		if (!string.Equals(trimmed, _current, StringComparison.OrdinalIgnoreCase))
 		{
 			if (_animations.TryGetValue(trimmed, out var frames))
 			{
-				_current = trimmed;
-				_frames = frames;
-				_frameIndex = 0;
-				_frameSeconds = 0f;
+				UseInternal(trimmed, frames);
 			}
+			else throw new ArgumentException($"Animation not found: '{animation}'");
 		}
 	}
 
 	public override void Update(float deltaTime, SyncSystem sync)
 	{
+		if (_switched)
+		{
+			_switched = false;
+
+			NotifyFrameChanged(_frames[_frameIndex], sync);
+		}
 		if (_running)
 		{
 			_frameSeconds += deltaTime;
 
-			float durationSeconds = (float)_frames[_frameIndex].Duration.TotalSeconds;
+			float frameDuration = _frames[_frameIndex].DurationSeconds;
 
-			while (_frameSeconds >= durationSeconds)
+			while (_frameSeconds >= frameDuration)
 			{
-				_frameSeconds -= durationSeconds;
+				_frameSeconds -= frameDuration;
 				_frameIndex++;
 
 				if (_frameIndex >= _frames.Length)
@@ -93,26 +127,46 @@ public class Animator<T>() : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 				if (_running)
 				{
 					var frame = _frames[_frameIndex];
-					durationSeconds = (float)frame.Duration.TotalSeconds;
 
-					var e = new KeyFrameEventArgs<T>(frame);
+					frameDuration = frame.DurationSeconds;
 
-					sync.Schedule(() =>
-					{
-						FrameChanged?.Invoke(this, e);
-					});
+					NotifyFrameChanged(frame, sync);
 				}
 				else break;
 			}
 		}
 	}
 
+	protected void NotifyFrameChanged(KeyFrame<T> frame, SyncSystem sync)
+	{
+		var handler = FrameChanged;
+
+		if (handler is not null)
+		{
+			var e = new KeyFrameEventArgs<T>(frame);
+
+			void RaiseEvent()
+			{
+				handler.Invoke(this, e);
+			}
+			sync.Schedule(RaiseEvent);
+		}
+	}
+
+	protected void UseInternal(string animation, KeyFrame<T>[] frames)
+	{
+		_switched = true;
+		_current = animation;
+		_frames = frames;
+		_frameIndex = 0;
+		_frameSeconds = 0f;
+	}
+
 	public KeyFrame<T>[] this[string key] => _animations[key];
+	public int Count => _animations.Count;
 
 	public IEnumerable<string> Keys => _animations.Keys;
 	public IEnumerable<KeyFrame<T>[]> Values => _animations.Values;
-
-	public int Count => _animations.Count;
 
 	public bool ContainsKey(string key) => _animations.ContainsKey(key);
 
@@ -121,10 +175,6 @@ public class Animator<T>() : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		return _animations.TryGetValue(key, out value);
 	}
 
-	public IEnumerator<KeyValuePair<string, KeyFrame<T>[]>> GetEnumerator()
-	{
-		return _animations.GetEnumerator();
-	}
-
+	public IEnumerator<KeyValuePair<string, KeyFrame<T>[]>> GetEnumerator() => _animations.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

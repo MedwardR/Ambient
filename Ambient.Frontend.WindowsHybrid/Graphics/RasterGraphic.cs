@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media;
 using Ambient.Backend.Geometry;
+using Ambient.Frontend.WindowsHybrid.Visuals;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 

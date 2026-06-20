@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Ambient.Backend.Animation;
 using Ambient.Backend.Contracts;
 
-namespace Ambient.Frontend.WindowsHybrid.Graphics;
+namespace Ambient.Frontend.WindowsHybrid.Visuals;
 
-public class Sprite : ISprite<BitmapSource>, IAsset
+public class Sprite : IAsset
 {
 	protected BitmapImage? _initialImage;
 	protected BitmapSource _bitmapSource;
@@ -63,7 +64,7 @@ public class Sprite : ISprite<BitmapSource>, IAsset
 		return frames;
 	}
 
-	public static BitmapSource Normalize(BitmapSource source)
+	protected static BitmapSource Normalize(BitmapSource source)
 	{
 		const double DPI = 96.0;
 
@@ -86,7 +87,7 @@ public class Sprite : ISprite<BitmapSource>, IAsset
 		else return source;
 	}
 
-	public static byte[] GetPixels(BitmapSource source)
+	protected static byte[] GetPixels(BitmapSource source)
 	{
 		int stride = GetStride(source);
 		byte[] pixels = new byte[stride * source.PixelHeight];
@@ -96,7 +97,7 @@ public class Sprite : ISprite<BitmapSource>, IAsset
 		return pixels;
 	}
 
-	private static int GetStride(BitmapSource source)
+	protected static int GetStride(BitmapSource source)
 	{
 		int bytesPerPixel = (source.Format.BitsPerPixel + 7) / 8;
 		return source.PixelWidth * bytesPerPixel;
