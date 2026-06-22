@@ -19,7 +19,7 @@ public class SyncSystem(SynchronizationContext context)
 			{
 				ExecuteScheduled(null);
 			}
-			else context.Send(ExecuteScheduled, null);
+			else context.Post(ExecuteScheduled, null);
 		}
 	}
 
@@ -31,3 +31,4 @@ public class SyncSystem(SynchronizationContext context)
 		}
 	}
 }
+ 

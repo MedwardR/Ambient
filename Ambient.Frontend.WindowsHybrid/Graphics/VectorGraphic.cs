@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public sealed class VectorGraphic : WindowsGraphic
+public sealed class VectorGraphic : GraphicWindow
 {
 	public Canvas Canvas { get; }
 

@@ -5,7 +5,7 @@ using Ambient.Frontend.WindowsHybrid.Visuals;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public class RasterGraphic : WindowsGraphic
+public class RasterGraphic : GraphicWindow
 {
 	public Image Image { get; }
 

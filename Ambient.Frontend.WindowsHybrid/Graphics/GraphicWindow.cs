@@ -2,15 +2,13 @@
 using System.ComponentModel;
 using System.Numerics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-using Ambient.Backend.Diagnostics;
 using Ambient.Backend.Geometry;
 using Ambient.Frontend.WindowsHybrid.Extensions;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public abstract class WindowsGraphic : IDisposable
+public abstract class GraphicWindow : IDisposable
 {
 	protected LinearTransform NodeTransform { get; }
 	protected MatrixTransform RenderTransform { get; }
@@ -32,7 +30,7 @@ public abstract class WindowsGraphic : IDisposable
 		set => Window.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
 	}
 
-	public WindowsGraphic(LinearTransform transform)
+	public GraphicWindow(LinearTransform transform)
 	{
 		var matrix = GetRenderMatrix(transform);
 
@@ -79,17 +77,41 @@ public abstract class WindowsGraphic : IDisposable
 			}
 			if (Window.ActualWidth > 0.0 && Window.ActualHeight > 0.0)
 			{
-				Window.Left = transform.Position.X - Window.ActualWidth / 2.0;
-				Window.Top = transform.Position.Y - Window.ActualHeight / 2.0;
+				double left = transform.Position.X - Window.ActualWidth / 2.0;
+				double top = transform.Position.Y - Window.ActualHeight / 2.0;
 
 				float length = GraphicElement.GetActualSize().Length();
 				float scale = MathF.Max(
 					MathF.Abs(transform.Scale.X),
 					MathF.Abs(transform.Scale.Y)
 				);
-				Window.Width = length * scale;
-				Window.Height = length * scale;
+				float width = length * scale;
+				float height = length * scale;
+
+				UpdateBounds(left, top, width, height);
 			}
+		}
+	}
+
+	protected void UpdateBounds(double left, double top, double width, double height)
+	{
+		const double epsilon = 1.0;
+
+		if (Math.Abs(Window.Left - left) > epsilon)
+		{
+			Window.Left = left;
+		}
+		if (Math.Abs(Window.Top - top) > epsilon)
+		{
+			Window.Top = top;
+		}
+		if (Math.Abs(Window.Width - width) > epsilon)
+		{
+			Window.Width = width;
+		}
+		if (Math.Abs(Window.Height - height) > epsilon)
+		{
+			Window.Height = height;
 		}
 	}
 
