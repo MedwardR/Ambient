@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -9,17 +10,23 @@ namespace Ambient.Frontend.WindowsHybrid.Application;
 
 public class AmbientApplication : System.Windows.Application
 {
-	public event EventHandler? ManageRequested;
-
 	public string Name
 	{
 		get => TrayIcon.Text;
 		set => TrayIcon.Text = value;
 	}
 
+	public Icon? Icon
+	{
+		get => TrayIcon.Icon;
+		set => TrayIcon.Icon = value;
+	}
+
 	public NotifyIcon TrayIcon { get; }
 
 	public World World { get; }
+
+	public FormFactory? FormFactory { get; set; }
 
 	public AmbientApplication()
 	{
@@ -28,12 +35,15 @@ public class AmbientApplication : System.Windows.Application
 		TrayIcon = new()
 		{
 			Text = "Ambient Application",
-			Icon = SystemIcons.Application,
+			Icon = GetIconOrDefault(),
 			Visible = true,
 		};
 		World = new(foreground);
 		ShutdownMode = ShutdownMode.OnExplicitShutdown;
+		FormFactory = null;
 	}
+
+	public void Manage() => OnManageRequested();
 
 	protected override void OnStartup(StartupEventArgs e)
 	{
@@ -43,23 +53,40 @@ public class AmbientApplication : System.Windows.Application
 		OnMenuCreating(menu);
 
 		TrayIcon.ContextMenuStrip = menu;
-		TrayIcon.DoubleClick += ManageClicked;
+		TrayIcon.DoubleClick += OnManageClicked;
 
 		World.StartThread();
 	}
 
 	protected virtual void OnMenuCreating(ContextMenuStrip menu)
 	{
-		menu.Items.Add("Manage", null, ManageClicked);
-		menu.Items.Add("Exit", null, ExitClicked);
+		menu.Items.Add("Manage", null, OnManageClicked);
+		menu.Items.Add("Exit", null, OnExitClicked);
 	}
 
-	private void ManageClicked(object? sender, EventArgs e)
+	protected virtual void OnManageRequested()
 	{
-		ManageRequested?.Invoke(this, EventArgs.Empty);
+		FormFactory?.ShowForm();
 	}
 
-	private void ExitClicked(object? sender, EventArgs e)
+	private static Icon GetIconOrDefault()
+	{
+		var path = Environment.ProcessPath;
+
+		if (File.Exists(path))
+		{
+			var ico = Icon.ExtractAssociatedIcon(path);
+			return ico ?? SystemIcons.Application;
+		}
+		else return SystemIcons.Application;
+	}
+
+	private void OnManageClicked(object? sender, EventArgs e)
+	{
+		OnManageRequested();
+	}
+
+	private void OnExitClicked(object? sender, EventArgs e)
 	{
 		try
 		{
