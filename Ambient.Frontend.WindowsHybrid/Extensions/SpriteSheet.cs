@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Ambient.Backend.Animation;
-using Ambient.Frontend.WindowsHybrid.Visuals;
+using Ambient.Frontend.WindowsHybrid.Graphics;
 
 namespace Ambient.Frontend.WindowsHybrid.Extensions;
 
-public static class SpriteSheet
+public static class Spritesheet
 {
 	public static KeyFrame<Sprite>[] Animate(this Sprite spritesheet, SpriteAnimationTemplate template)
 	{

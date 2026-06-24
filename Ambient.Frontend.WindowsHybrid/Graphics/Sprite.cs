@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using Ambient.Backend.Animation;
 using Ambient.Backend.Contracts;
 
-namespace Ambient.Frontend.WindowsHybrid.Visuals;
+namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
 public class Sprite : IAsset
 {

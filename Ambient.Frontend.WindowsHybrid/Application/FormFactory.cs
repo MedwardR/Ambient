@@ -4,7 +4,7 @@ using System.Windows.Threading;
 
 namespace Ambient.Frontend.WindowsHybrid.Application;
 
-public abstract class FormFactory : IDisposable
+public class FormFactory : IDisposable
 {
 	protected readonly Func<Form> _factory;
 	protected readonly DispatcherTimer _recycleTimer;
@@ -30,7 +30,7 @@ public abstract class FormFactory : IDisposable
 
 		if (FormInstance is null || FormInstance.IsDisposed)
 		{
-			FormInstance = new();
+			FormInstance = _factory();
 			FormInstance.FormClosing += OnClosing;
 		}
 		FormInstance.Show();
@@ -86,9 +86,4 @@ public abstract class FormFactory : IDisposable
 			FormInstance = null;
 		}
 	}
-}
-
-public class FormFactory<T>() : FormFactory(Instantiate) where T : Form, new()
-{
-	protected static T Instantiate() => new();
 }

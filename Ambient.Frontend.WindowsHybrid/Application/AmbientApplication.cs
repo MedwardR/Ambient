@@ -1,19 +1,32 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Ambient.Backend.Kernel;
+using Ambient.Frontend.WindowsHybrid.Graphics;
+using Ambient.Frontend.WindowsHybrid.Utilities;
 
 namespace Ambient.Frontend.WindowsHybrid.Application;
 
 public class AmbientApplication : System.Windows.Application
 {
+	public NotifyIcon TrayIcon { get; }
+
+	public World World { get; }
+
+	public VirtualViewport Viewport { get; }
+
+	public FormFactory? FormFactory { get; set; }
+
 	public string Name
 	{
 		get => TrayIcon.Text;
-		set => TrayIcon.Text = value;
+		set
+		{
+			TrayIcon.Text = value;
+			Viewport.Title = value;
+		}
 	}
 
 	public Icon? Icon
@@ -22,28 +35,25 @@ public class AmbientApplication : System.Windows.Application
 		set => TrayIcon.Icon = value;
 	}
 
-	public NotifyIcon TrayIcon { get; }
-
-	public World World { get; }
-
-	public FormFactory? FormFactory { get; set; }
-
 	public AmbientApplication()
 	{
 		var foreground = new DispatcherSynchronizationContext(Dispatcher);
+		var world = new World(foreground);
+
+		var bounds = ScreenInformation.GetCombinedWorkingArea();
 
 		TrayIcon = new()
 		{
 			Text = "Ambient Application",
-			Icon = GetIconOrDefault(),
+			Icon = SystemFunctions.ExtractApplicationIcon(),
 			Visible = true,
 		};
-		World = new(foreground);
+		World = world;
+		Viewport = new(world, bounds);
+
 		ShutdownMode = ShutdownMode.OnExplicitShutdown;
 		FormFactory = null;
 	}
-
-	public void Manage() => OnManageRequested();
 
 	protected override void OnStartup(StartupEventArgs e)
 	{
@@ -64,29 +74,12 @@ public class AmbientApplication : System.Windows.Application
 		menu.Items.Add("Exit", null, OnExitClicked);
 	}
 
-	protected virtual void OnManageRequested()
+	public void Manage()
 	{
 		FormFactory?.ShowForm();
 	}
 
-	private static Icon GetIconOrDefault()
-	{
-		var path = Environment.ProcessPath;
-
-		if (File.Exists(path))
-		{
-			var ico = Icon.ExtractAssociatedIcon(path);
-			return ico ?? SystemIcons.Application;
-		}
-		else return SystemIcons.Application;
-	}
-
-	private void OnManageClicked(object? sender, EventArgs e)
-	{
-		OnManageRequested();
-	}
-
-	private void OnExitClicked(object? sender, EventArgs e)
+	public new void Exit()
 	{
 		try
 		{
@@ -98,4 +91,8 @@ public class AmbientApplication : System.Windows.Application
 			Shutdown();
 		}
 	}
+
+	private void OnManageClicked(object? sender, EventArgs e) => Manage();
+
+	private void OnExitClicked(object? sender, EventArgs e) => Exit();
 }

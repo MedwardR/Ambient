@@ -1,17 +1,18 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-using Ambient.Backend.Geometry;
-using Ambient.Frontend.WindowsHybrid.Visuals;
+using Ambient.Frontend.WindowsHybrid.Contracts;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 
-public class RasterGraphic : GraphicWindow
+public class RasterGraphic : IGraphic
 {
 	public Image Image { get; }
 
-	public RasterGraphic(LinearTransform transform) : base(transform)
+	FrameworkElement IGraphic.Element => Image;
+
+	public RasterGraphic()
 	{
-		Title = "Ambient Raster Graphic";
 		Image = new()
 		{
 			Source = null,
@@ -22,7 +23,6 @@ public class RasterGraphic : GraphicWindow
 			Image,
 			BitmapScalingMode.Linear
 		);
-		GraphicElement = Image;
 	}
 
 	public void Use(Sprite sprite) => Image.Source = sprite.Source;

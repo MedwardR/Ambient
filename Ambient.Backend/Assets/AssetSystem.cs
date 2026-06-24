@@ -5,7 +5,7 @@ namespace Ambient.Backend.Assets;
 
 public class AssetSystem
 {
-	protected readonly ConcurrentDictionary<string, byte[]> _cache = [];
+	protected readonly ConcurrentDictionary<string, byte[]> _cache = new(StringComparer.OrdinalIgnoreCase);
 
 	protected static string ApplicationRoot { get; } = AppContext.BaseDirectory;
 
@@ -15,10 +15,9 @@ public class AssetSystem
 
 	public AssetSystem(string root) => AssetsRoot = root;
 
-	public T LoadAsset<T>(string path) where T : IAsset, new()
+	public T Load<T>(string path) where T : IAsset, new()
 	{
-		string key = Resolve(path);
-		byte[] buffer = _cache.GetOrAdd(key, File.ReadAllBytes);
+		byte[] buffer = Load(path);
 
 		var asset = new T();
 		asset.Load(buffer);
@@ -26,9 +25,17 @@ public class AssetSystem
 		return asset;
 	}
 
+	public byte[] Load(string path)
+	{
+		string key = Resolve(path);
+
+		return _cache.GetOrAdd(key, File.ReadAllBytes);
+	}
+
 	public virtual string Resolve(string relativePath)
 	{
-		string normalized = relativePath.Replace('\\', '/');
+		string normalized = relativePath.Replace('\\', '/').Trim();
+
 		string combined = Path.Combine(ApplicationRoot, AssetsRoot, normalized);
 		string path = Path.GetFullPath(combined);
 
