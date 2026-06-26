@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Ambient.Backend.Contracts;
 
-namespace Ambient.Frontend.WindowsHybrid.Graphics;
+namespace Ambient.Frontend.WindowsHybrid.Assets;
 
 public class Sprite : IAsset
 {

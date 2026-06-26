@@ -35,16 +35,16 @@ public class AmbientApplication : System.Windows.Application
 		set => TrayIcon.Icon = value;
 	}
 
-	public AmbientApplication()
+	public AmbientApplication(string name)
 	{
 		var foreground = new DispatcherSynchronizationContext(Dispatcher);
-		var world = new World(foreground);
 
+		var world = new World(foreground);
 		var bounds = ScreenInformation.GetCombinedWorkingArea();
 
 		TrayIcon = new()
 		{
-			Text = "Ambient Application",
+			Text = name,
 			Icon = SystemFunctions.ExtractApplicationIcon(),
 			Visible = true,
 		};

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Ambient.Backend.Geometry;
 using Ambient.Backend.Kernel;
 using Ambient.Frontend.WindowsHybrid.Contracts;
 using Ambient.Frontend.WindowsHybrid.Extensions;
@@ -12,9 +14,10 @@ namespace Ambient.Frontend.WindowsHybrid.Graphics;
 public class VirtualViewport
 {
 	protected readonly World _world;
+	protected readonly Rect _bounds;
 
-	protected readonly Window _window;
 	protected readonly Canvas _canvas;
+	protected readonly Window _window;
 
 	protected readonly Stack<Node> _stack;
 	protected readonly HashSet<UIElement> _elements;
@@ -28,6 +31,7 @@ public class VirtualViewport
 	public VirtualViewport(World world, Rect bounds)
 	{
 		_world = world;
+		_bounds = bounds;
 		_canvas = new()
 		{
 			Background = Brushes.Transparent,
@@ -82,18 +86,46 @@ public class VirtualViewport
 
 	protected virtual void Render(IVisual v)
 	{
+		var transform = v.Transform;
 		var element = v.Graphics.Element;
 
 		if (_elements.Add(element))
 		{
 			_canvas.Children.Add(element);
 		}
-		var matrix = v.GetRenderMatrix();
+		var matrix = GetRenderMatrix(transform, element);
 
 		if (element.RenderTransform is not MatrixTransform current || current.Matrix != matrix)
 		{
 			element.RenderTransform = new MatrixTransform(matrix);
-			element.RenderTransformOrigin = new(0.5, 0.5);
 		}
+	}
+
+	protected virtual Matrix GetRenderMatrix(LinearTransform transform, FrameworkElement element)
+	{
+		var matrix = Matrix.Identity;
+		var center = element.RenderSize.Center();
+
+		matrix.Translate(-center.X, -center.Y);
+
+		if (transform.Scale != Vector2.One || transform.FlipX || transform.FlipY)
+		{
+			double x = transform.FlipX ? -transform.Scale.X : transform.Scale.X;
+			double y = transform.FlipY ? -transform.Scale.Y : transform.Scale.Y;
+
+			matrix.Scale(x, y);
+		}
+		if (transform.Rotation != Angle.Zero)
+		{
+			matrix.Rotate(transform.Rotation.Degrees);
+		}
+		if (transform.Position != Vector2.Zero)
+		{
+			double x = transform.Position.X - _bounds.X;
+			double y = transform.Position.Y - _bounds.Y;
+
+			matrix.Translate(x, y);
+		}
+		return matrix;
 	}
 }

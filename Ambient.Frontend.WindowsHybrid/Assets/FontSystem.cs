@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Text;
 using Ambient.Backend.Assets;
 
-namespace Ambient.Frontend.WindowsHybrid.Graphics;
+namespace Ambient.Frontend.WindowsHybrid.Assets;
 
 public class FontSystem(AssetSystem assets)
 {

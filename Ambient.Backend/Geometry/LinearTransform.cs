@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using Ambient.Backend.Geometry;
 
 namespace Ambient.Backend.Geometry;
 

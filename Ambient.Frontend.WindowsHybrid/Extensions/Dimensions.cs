@@ -5,11 +5,11 @@ namespace Ambient.Frontend.WindowsHybrid.Extensions;
 
 public static class Dimensions
 {
-	public static Vector2 GetActualSize(this FrameworkElement element)
+	public static Vector2 Center(this Size size)
 	{
-		float width = (float)element.ActualWidth;
-		float height = (float)element.ActualHeight;
+		float x = (float)size.Width / 2f;
+		float y = (float)size.Height / 2f;
 
-		return new(width, height);
+		return new(x, y);
 	}
 }

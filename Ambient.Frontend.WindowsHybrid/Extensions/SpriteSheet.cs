@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Ambient.Backend.Animation;
-using Ambient.Frontend.WindowsHybrid.Graphics;
+using Ambient.Frontend.WindowsHybrid.Assets;
 
 namespace Ambient.Frontend.WindowsHybrid.Extensions;
 
