@@ -34,15 +34,13 @@ public class AmbientApplication : System.Windows.Application
 		World = world;
 		Viewport = new(world, bounds);
 
-		ShutdownMode = ShutdownMode.OnLastWindowClose;
+		ShutdownMode = ShutdownMode.OnExplicitShutdown;
 		FormFactory = null;
 
 		Viewport.Window.Title = name;
-	}
 
-	public new void Run()
-	{
-		Run(Viewport.Window);
+		TrayIcon.Click += OnClick;
+		TrayIcon.DoubleClick += OnManageClicked;
 	}
 
 	protected override void OnStartup(StartupEventArgs e)
@@ -53,7 +51,6 @@ public class AmbientApplication : System.Windows.Application
 		OnMenuCreating(menu);
 
 		TrayIcon.ContextMenuStrip = menu;
-		TrayIcon.DoubleClick += OnManageClicked;
 
 		World.StartThread();
 	}
@@ -64,12 +61,19 @@ public class AmbientApplication : System.Windows.Application
 		menu.Items.Add("Exit", null, OnExitClicked);
 	}
 
+	public void FocusViewport()
+	{
+		Viewport.Window.Show();
+		Viewport.Window.Activate();
+		Viewport.Window.Focus();
+	}
+
 	public void Manage()
 	{
 		FormFactory?.ShowForm();
 	}
 
-	public new void Exit()
+	public void Quit()
 	{
 		try
 		{
@@ -82,7 +86,9 @@ public class AmbientApplication : System.Windows.Application
 		}
 	}
 
+	private void OnClick(object? sender, EventArgs e) => FocusViewport();
+
 	private void OnManageClicked(object? sender, EventArgs e) => Manage();
 
-	private void OnExitClicked(object? sender, EventArgs e) => Exit();
+	private void OnExitClicked(object? sender, EventArgs e) => Quit();
 }

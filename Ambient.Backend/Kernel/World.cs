@@ -26,6 +26,8 @@ public class World
 		FramesPerSecond = 60.0;
 	}
 
+	public T Singleton<T>() => Nodes.OfType<T>().Single();
+
 	public void StartThread()
 	{
 		_running = true;

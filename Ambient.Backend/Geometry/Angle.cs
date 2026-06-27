@@ -7,7 +7,9 @@ public readonly record struct Angle
 	public readonly float Degrees;
 	public readonly float Radians;
 
-	public static readonly Angle Zero = new(0f, 0f);
+	public static Angle Zero => new(0f, 0f);
+
+	public static Angle Pi => new(180f, MathF.PI);
 
 	private Angle(float degrees, float radians)
 	{
@@ -17,30 +19,30 @@ public readonly record struct Angle
 
 	public static Angle FromDegrees(float degrees)
 	{
-		float radians = DegreesToRadians(degrees);
+		float radians = ToRadians(degrees);
 		return new(degrees, radians);
 	}
 
 	public static Angle FromRadians(float radians)
 	{
-		float degrees = RadiansToDegrees(radians);
+		float degrees = ToDegrees(radians);
 		return new(degrees, radians);
 	}
 
 	public static Angle FromVector(Vector2 vector)
 	{
 		float radians = MathF.Atan2(vector.Y, vector.X);
-		float degrees = RadiansToDegrees(radians);
+		float degrees = ToDegrees(radians);
 
 		return new(degrees, radians);
 	}
 
-	public static float DegreesToRadians(float degrees)
+	public static float ToRadians(float degrees)
 	{
 		return degrees * MathF.PI / 180f;
 	}
 
-	public static float RadiansToDegrees(float radians)
+	public static float ToDegrees(float radians)
 	{
 		return radians * (180f / MathF.PI);
 	}
