@@ -25,7 +25,7 @@ public static class Transformable
 		}
 	}
 
-	public static void PointTowards(this ITransformable node, Vector2 target)
+	public static void LookTowards(this ITransformable node, Vector2 target)
 	{
 		var position = node.Transform.Position;
 

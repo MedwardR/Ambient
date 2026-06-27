@@ -5,17 +5,20 @@ namespace Ambient.Frontend.WindowsHybrid.Extensions;
 
 public static class Ancestry
 {
-	public static IEnumerable<Control> Collect(this Control parent)
+	public static IEnumerable<Control> Collect(this Control root)
 	{
-		yield return parent;
+		var stack = new Stack<Control>();
+		stack.Push(root);
 
-		foreach (Control control in parent.Controls)
+		while (stack.Count > 0)
 		{
-			var collection = Collect(control);
+			var current = stack.Pop();
+			yield return current;
 
-			foreach (Control c in collection)
+			for (int index = 0; index < current.Controls.Count; index++)
 			{
-				yield return c;
+				var child = current.Controls[index];
+				stack.Push(child);
 			}
 		}
 	}

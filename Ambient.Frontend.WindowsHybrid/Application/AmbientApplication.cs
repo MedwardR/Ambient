@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -19,22 +18,6 @@ public class AmbientApplication : System.Windows.Application
 
 	public FormFactory? FormFactory { get; set; }
 
-	public string Name
-	{
-		get => TrayIcon.Text;
-		set
-		{
-			TrayIcon.Text = value;
-			Viewport.Title = value;
-		}
-	}
-
-	public Icon? Icon
-	{
-		get => TrayIcon.Icon;
-		set => TrayIcon.Icon = value;
-	}
-
 	public AmbientApplication(string name)
 	{
 		var foreground = new DispatcherSynchronizationContext(Dispatcher);
@@ -51,8 +34,15 @@ public class AmbientApplication : System.Windows.Application
 		World = world;
 		Viewport = new(world, bounds);
 
-		ShutdownMode = ShutdownMode.OnExplicitShutdown;
+		ShutdownMode = ShutdownMode.OnLastWindowClose;
 		FormFactory = null;
+
+		Viewport.Window.Title = name;
+	}
+
+	public new void Run()
+	{
+		Run(Viewport.Window);
 	}
 
 	protected override void OnStartup(StartupEventArgs e)

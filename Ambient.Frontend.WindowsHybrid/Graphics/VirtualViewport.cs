@@ -16,27 +16,25 @@ public class VirtualViewport
 	protected readonly World _world;
 	protected readonly Rect _bounds;
 
-	protected readonly Canvas _canvas;
-	protected readonly Window _window;
-
 	protected readonly Stack<Node> _stack;
 	protected readonly HashSet<UIElement> _elements;
 
-	public string Title
-	{
-		get => _window.Title;
-		set => _window.Title = value;
-	}
+	protected bool _allowClosing;
+
+	public Window Window { get; }
+
+	public Canvas Canvas { get; }
 
 	public VirtualViewport(World world, Rect bounds)
 	{
 		_world = world;
 		_bounds = bounds;
-		_canvas = new()
+
+		Canvas = new()
 		{
 			Background = Brushes.Transparent,
 		};
-		_window = new()
+		Window = new()
 		{
 			Title = "Ambient Application",
 			WindowStyle = WindowStyle.None,
@@ -44,6 +42,7 @@ public class VirtualViewport
 			AllowsTransparency = true,
 			Background = Brushes.Transparent,
 			ResizeMode = ResizeMode.NoResize,
+			ShowInTaskbar = false,
 			Visibility = Visibility.Visible,
 
 			Left = bounds.Left,
@@ -51,10 +50,13 @@ public class VirtualViewport
 			Width = bounds.Width,
 			Height = bounds.Height,
 
-			Content = _canvas,
+			Content = Canvas,
 		};
 		_stack = [];
 		_elements = [];
+		_allowClosing = false;
+
+		Window.Closing += (s, e) => e.Cancel = !_allowClosing;
 
 		CompositionTarget.Rendering += OnRendering;
 	}
@@ -91,7 +93,7 @@ public class VirtualViewport
 
 		if (_elements.Add(element))
 		{
-			_canvas.Children.Add(element);
+			Canvas.Children.Add(element);
 		}
 		var matrix = GetRenderMatrix(transform, element);
 
