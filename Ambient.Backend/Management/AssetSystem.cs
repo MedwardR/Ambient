@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Ambient.Backend.Contracts;
 
-namespace Ambient.Backend.Assets;
+namespace Ambient.Backend.Management;
 
 public class AssetSystem
 {

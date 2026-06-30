@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Ambient.Backend.Threading;
+using Ambient.Backend.Management;
 
 namespace Ambient.Backend.Kernel;
 
@@ -13,6 +13,8 @@ public class World
 
 	public double FramesPerSecond { get; set; }
 
+	public double MaxDeltaTime { get; set; }
+
 	public World(SynchronizationContext foreground)
 	{
 		_sync = new(foreground);
@@ -24,6 +26,7 @@ public class World
 
 		Nodes = [];
 		FramesPerSecond = 60.0;
+		MaxDeltaTime = 1.0;
 	}
 
 	public T Singleton<T>() => Nodes.OfType<T>().Single();
@@ -46,7 +49,7 @@ public class World
 
 		while (_running)
 		{
-			float deltaTime = (float)sw.Elapsed.TotalSeconds;
+			float deltaTime = (float)Math.Min(sw.Elapsed.TotalSeconds, MaxDeltaTime);
 			sw.Restart();
 
 			foreach (var n in Nodes)

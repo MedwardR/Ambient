@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Ambient.Backend.Events;
 using Ambient.Backend.Kernel;
-using Ambient.Backend.Threading;
+using Ambient.Backend.Management;
 
 namespace Ambient.Backend.Animation;
 

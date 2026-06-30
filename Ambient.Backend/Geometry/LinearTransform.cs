@@ -10,7 +10,7 @@ public class LinearTransform
 
 	public Vector2 Scale { get; set; } = Vector2.One;
 
-	public bool FlipX { get; set; }
+	public bool FlipX { get; set; } = false;
 
-	public bool FlipY { get; set; }
+	public bool FlipY { get; set; } = false;
 }

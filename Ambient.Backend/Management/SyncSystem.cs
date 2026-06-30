@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Ambient.Backend.Threading;
+namespace Ambient.Backend.Management;
 
 public class SyncSystem(SynchronizationContext context)
 {
