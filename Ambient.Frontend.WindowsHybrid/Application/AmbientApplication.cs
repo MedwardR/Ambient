@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Ambient.Backend.Kernel;
+using Ambient.Frontend.WindowsHybrid.Extensions;
 using Ambient.Frontend.WindowsHybrid.Graphics;
 using Ambient.Frontend.WindowsHybrid.Utilities;
 
@@ -23,7 +24,7 @@ public class AmbientApplication : System.Windows.Application
 		var foreground = new DispatcherSynchronizationContext(Dispatcher);
 
 		var world = new World(foreground);
-		var bounds = ScreenInformation.GetCombinedWorkingArea();
+		var bounds = ScreenInformation.GetCombinedWorkingArea().ToRect();
 
 		TrayIcon = new()
 		{

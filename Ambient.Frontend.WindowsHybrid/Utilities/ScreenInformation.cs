@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Numerics;
-using System.Windows;
 using System.Windows.Forms;
 
 namespace Ambient.Frontend.WindowsHybrid.Utilities;
@@ -14,11 +13,11 @@ public static class ScreenInformation
 		return new(position.X, position.Y);
 	}
 
-	public static Rect[] GetWorkingAreas()
+	public static Rectangle[] GetWorkingAreas()
 	{
 		var screens = Screen.AllScreens;
 
-		var workingAreas = new Rect[screens.Length];
+		var workingAreas = new Rectangle[screens.Length];
 
 		for (int index = 0; index < screens.Length; index++)
 		{
@@ -29,7 +28,7 @@ public static class ScreenInformation
 		return workingAreas;
 	}
 
-	public static Rect GetCombinedWorkingArea()
+	public static Rectangle GetCombinedWorkingArea()
 	{
 		var screens = Screen.AllScreens;
 
@@ -41,6 +40,6 @@ public static class ScreenInformation
 
 			bounds = Rectangle.Union(bounds, area);
 		}
-		return new Rect(bounds.Left, bounds.Top, bounds.Width, bounds.Height);
+		return bounds;
 	}
 }
