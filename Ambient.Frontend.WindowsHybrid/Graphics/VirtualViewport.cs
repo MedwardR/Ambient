@@ -74,7 +74,7 @@ public class VirtualViewport
 		{
 			var n = _stack.Pop();
 
-			if (n is IVisual v)
+			if (n is IActor v)
 			{
 				Render(v);
 			}
@@ -86,7 +86,7 @@ public class VirtualViewport
 		}
 	}
 
-	protected virtual void Render(IVisual v)
+	protected virtual void Render(IActor v)
 	{
 		var transform = v.Transform;
 		var element = v.Graphics.Element;

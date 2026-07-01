@@ -5,40 +5,55 @@ namespace Ambient.Backend.Timing;
 
 public class FrameRateMonitor(float intervalSeconds) : Node
 {
-	protected readonly Cooldown _cooldown = new(intervalSeconds);
+	protected bool _running = false;
 	protected int _frameCount = 0;
+	protected float _totalSeconds = 0f;
 
 	public event EventHandler<FrameRateEventArgs>? Tick;
 
-	public void Start() => _cooldown.Start();
-	public void Pause() => _cooldown.Pause();
-	public void Stop() => _cooldown.Stop();
-	public void Restart() => _cooldown.Restart();
+	public void Start() => _running = true;
+
+	public void Pause() => _running = false;
+
+	public void Stop()
+	{
+		_running = false;
+		_frameCount = 0;
+		_totalSeconds = 0f;
+	}
+
+	public void Restart()
+	{
+		_running = true;
+		_frameCount = 0;
+		_totalSeconds = 0f;
+	}
 
 	public override void Update(float deltaTime)
 	{
-		if (_cooldown.IsRunning)
+		if (_running)
 		{
 			_frameCount++;
+			_totalSeconds += deltaTime;
 
-			if (_cooldown.Tick())
+			if (intervalSeconds >= 0 && _totalSeconds > intervalSeconds)
 			{
 				float fps = AverageFramesPerSecond();
 				var e = new FrameRateEventArgs(fps);
 
 				Tick?.Invoke(this, e);
 
-				_cooldown.Restart();
 				_frameCount = 0;
+				_totalSeconds -= intervalSeconds;
 			}
 		}
 	}
 
 	public float AverageFramesPerSecond()
 	{
-		if (_cooldown.TotalSeconds != 0f)
+		if (_totalSeconds != 0f)
 		{
-			return _frameCount / _cooldown.TotalSeconds;
+			return _frameCount / _totalSeconds;
 		}
 		else return 0f;
 	}
