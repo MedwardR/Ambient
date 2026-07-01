@@ -29,7 +29,7 @@ public class FrameRateMonitor(float intervalSeconds) : Node
 		_totalSeconds = 0f;
 	}
 
-	public override void Update(float deltaTime)
+	protected override void Update(float deltaTime)
 	{
 		if (_running)
 		{
@@ -65,4 +65,6 @@ public class FrameRateMonitor(float intervalSeconds) : Node
 
 		return monitor;
 	}
+
+	protected override IEnumerable<Node> Compose() => [];
 }

@@ -12,7 +12,6 @@ public class World
 	public List<Node> Nodes { get; }
 
 	public double FramesPerSecond { get; set; }
-
 	public double MaxDeltaTime { get; set; }
 
 	public World(SynchronizationContext foreground)
@@ -54,6 +53,10 @@ public class World
 
 			foreach (var n in Nodes)
 			{
+				if (!n.Initialized)
+				{
+					n.ComposeInternal();
+				}
 				n.UpdateInternal(deltaTime, _sync);
 			}
 			_sync.Flush();

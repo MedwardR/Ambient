@@ -1,11 +1,19 @@
 ﻿using System.Collections.Generic;
 using Ambient.Backend.Animation;
+using Ambient.Backend.Management;
 using Ambient.Frontend.WindowsHybrid.Assets;
 
 namespace Ambient.Frontend.WindowsHybrid.Extensions;
 
 public static class Spritesheet
 {
+	public static KeyFrame<Sprite>[] Load(this AssetSystem assets, string path, SpriteAnimationTemplate template)
+	{
+		var sprite = assets.Load<Sprite>(path);
+
+		return sprite.Animate(template);
+	}
+
 	public static KeyFrame<Sprite>[] Animate(this Sprite spritesheet, SpriteAnimationTemplate template)
 	{
 		var sprites = spritesheet.Split(template.FrameWidth, template.FrameHeight);

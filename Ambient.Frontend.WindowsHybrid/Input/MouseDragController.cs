@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Numerics;
 using System.Windows.Input;
+using Ambient.Backend.Kernel;
 using Ambient.Frontend.WindowsHybrid.Contracts;
 using Ambient.Frontend.WindowsHybrid.Utilities;
 
 namespace Ambient.Frontend.WindowsHybrid.Input;
 
-public class MouseDragController : IDisposable
+public class MouseDragController : Node, IDisposable
 {
 	protected readonly IActor _actor;
 
@@ -25,7 +26,6 @@ public class MouseDragController : IDisposable
 		var element = _actor.Graphics.Element;
 
 		element.MouseLeftButtonDown += OnMouseDown;
-		element.MouseMove += OnMouseMove;
 		element.MouseLeftButtonUp += OnMouseUp;
 		element.LostMouseCapture += OnMouseUp;
 	}
@@ -36,45 +36,48 @@ public class MouseDragController : IDisposable
 
 	protected virtual void OnMouseDown(object sender, MouseButtonEventArgs e)
 	{
-		if (Enabled && !IsDragging)
-		{
-			var cursor = ScreenInformation.GetMousePosition();
-
-			IsDragging = true;
-			DragOffset = _actor.Transform.Position - cursor;
-
-			_actor.Graphics.Element.CaptureMouse();
-
-			DraggingStarted?.Invoke(this, EventArgs.Empty);
-		}
+		if (Enabled && !IsDragging) Drag();
 	}
 
-	protected virtual void OnMouseMove(object sender, MouseEventArgs e)
+	protected virtual void OnMouseUp(object sender, MouseEventArgs e)
+	{
+		if (IsDragging) Drop();
+	}
+
+	protected virtual void Drag()
+	{
+		var cursor = ScreenInformation.GetMousePosition();
+
+		IsDragging = true;
+		DragOffset = _actor.Transform.Position - cursor;
+
+		_actor.Graphics.Element.CaptureMouse();
+
+		DraggingStarted?.Invoke(this, EventArgs.Empty);
+	}
+
+	public override void EarlyUpdate(float deltaTime)
 	{
 		if (IsDragging)
 		{
 			if (Enabled)
 			{
-				var cursor = ScreenInformation.GetMousePosition();
-				_actor.Transform.Position = cursor + DragOffset;
+				_actor.Transform.Position = ScreenInformation.GetMousePosition();
 			}
-			else OnMouseUp(sender, e);
+			else Drop();
 		}
 	}
 
-	protected virtual void OnMouseUp(object sender, MouseEventArgs e)
+	protected virtual void Drop()
 	{
-		if (IsDragging)
+		try
 		{
-			try
-			{
-				IsDragging = false;
-				DraggingEnded?.Invoke(this, EventArgs.Empty);
-			}
-			finally
-			{
-				_actor.Graphics.Element.ReleaseMouseCapture();
-			}
+			IsDragging = false;
+			DraggingEnded?.Invoke(this, EventArgs.Empty);
+		}
+		finally
+		{
+			_actor.Graphics.Element.ReleaseMouseCapture();
 		}
 	}
 
@@ -91,7 +94,6 @@ public class MouseDragController : IDisposable
 			var element = _actor.Graphics.Element;
 
 			element.MouseLeftButtonDown -= OnMouseDown;
-			element.MouseMove -= OnMouseMove;
 			element.MouseLeftButtonUp -= OnMouseUp;
 			element.LostMouseCapture -= OnMouseUp;
 		}

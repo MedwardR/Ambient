@@ -2,7 +2,7 @@
 
 namespace Ambient.Backend.Timing;
 
-public class Cooldown(float intervalSeconds) : Node
+public class TimeInterval(float intervalSeconds) : Node
 {
 	public bool IsRunning { get; set; } = false;
 	public float IntervalSeconds { get; set; } = intervalSeconds;
@@ -24,14 +24,6 @@ public class Cooldown(float intervalSeconds) : Node
 		TotalSeconds = 0f;
 	}
 
-	public override void Update(float deltaTime)
-	{
-		if (IsRunning)
-		{
-			TotalSeconds += deltaTime;
-		}
-	}
-
 	public virtual bool Tick()
 	{
 		if (IntervalSeconds > 0 && TotalSeconds >= IntervalSeconds)
@@ -43,11 +35,21 @@ public class Cooldown(float intervalSeconds) : Node
 		else return false;
 	}
 
-	public static Cooldown StartNew(float intervalSeconds)
+	protected override void EarlyUpdate(float deltaTime)
 	{
-		var cooldown = new Cooldown(intervalSeconds);
+		if (IsRunning)
+		{
+			TotalSeconds += deltaTime;
+		}
+	}
+
+	public static TimeInterval StartNew(float intervalSeconds)
+	{
+		var cooldown = new TimeInterval(intervalSeconds);
 		cooldown.Start();
 
 		return cooldown;
 	}
+
+	protected override IEnumerable<Node> Compose() => [];
 }

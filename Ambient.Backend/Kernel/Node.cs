@@ -4,10 +4,29 @@ namespace Ambient.Backend.Kernel;
 
 public abstract class Node
 {
+	public bool Initialized { get; private set; } = false;
+
 	public List<Node> Nodes { get; } = [];
+
+	internal void ComposeInternal()
+	{
+		var children = Compose();
+		var missing = children.Except(Nodes);
+
+		Nodes.AddRange(missing);
+
+		foreach (var n in children)
+		{
+			n.ComposeInternal();
+		}
+		Initialized = true;
+	}
 
 	internal void UpdateInternal(float deltaTime, SyncSystem sync)
 	{
+		EarlyUpdate(deltaTime);
+		EarlyUpdate(deltaTime, sync);
+
 		foreach (var n in Nodes)
 		{
 			n.UpdateInternal(deltaTime, sync);
@@ -16,7 +35,13 @@ public abstract class Node
 		Update(deltaTime, sync);
 	}
 
-	public virtual void Update(float deltaTime) { }
+	protected abstract IEnumerable<Node> Compose();
 
-	public virtual void Update(float deltaTime, SyncSystem sync) { }
+	protected virtual void EarlyUpdate(float deltaTime) { }
+
+	protected virtual void EarlyUpdate(float deltaTime, SyncSystem sync) { }
+
+	protected virtual void Update(float deltaTime) { }
+
+	protected virtual void Update(float deltaTime, SyncSystem sync) { }
 }

@@ -96,7 +96,16 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		}
 	}
 
-	public override void Update(float deltaTime, SyncSystem sync)
+	protected void UseInternal(string animation, KeyFrame<T>[] frames)
+	{
+		_switched = true;
+		_current = animation;
+		_frames = frames;
+		_frameIndex = 0;
+		_frameSeconds = 0f;
+	}
+
+	protected override void Update(float deltaTime, SyncSystem sync)
 	{
 		if (_switched)
 		{
@@ -153,15 +162,6 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		}
 	}
 
-	protected void UseInternal(string animation, KeyFrame<T>[] frames)
-	{
-		_switched = true;
-		_current = animation;
-		_frames = frames;
-		_frameIndex = 0;
-		_frameSeconds = 0f;
-	}
-
 	public KeyFrame<T>[] this[string key] => _animations[key];
 	public int Count => _animations.Count;
 
@@ -177,4 +177,6 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 
 	public IEnumerator<KeyValuePair<string, KeyFrame<T>[]>> GetEnumerator() => _animations.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+	protected override IEnumerable<Node> Compose() => [];
 }
