@@ -1,4 +1,4 @@
-﻿namespace Ambient.Frontend.WindowsHybrid.Assets;
+﻿namespace Ambient.Frontend.WindowsHybrid.Sprites;
 
 public readonly record struct SpriteAnimationTemplate(
 	int FrameWidth,

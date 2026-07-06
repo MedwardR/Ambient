@@ -1,4 +1,4 @@
-﻿using Ambient.Backend.Management;
+﻿using Ambient.Backend.IO;
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Ambient.Frontend.WindowsHybrid.Extensions;
 
-namespace Ambient.Frontend.WindowsHybrid.Assets;
+namespace Ambient.Frontend.WindowsHybrid.Application;
 
 public class FontSystem(AssetSystem assets)
 {
@@ -19,7 +19,7 @@ public class FontSystem(AssetSystem assets)
 
 	public FontFamily Load(string path)
 	{
-		string key = _assets.Resolve(path);
+		string key = _assets.Resolve(path).AbsolutePath;
 
 		int Factory(string path)
 		{

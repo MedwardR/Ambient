@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Windows.Input;
 using Ambient.Backend.Kernel;
@@ -56,13 +57,15 @@ public class MouseDragController : Node, IDisposable
 		DraggingStarted?.Invoke(this, EventArgs.Empty);
 	}
 
-	public override void EarlyUpdate(float deltaTime)
+	protected override void EarlyUpdate(float deltaTime)
 	{
 		if (IsDragging)
 		{
 			if (Enabled)
 			{
-				_actor.Transform.Position = ScreenInformation.GetMousePosition();
+				var cursor = ScreenInformation.GetMousePosition();
+
+				_actor.Transform.Position = cursor + DragOffset;
 			}
 			else Drop();
 		}
@@ -98,4 +101,6 @@ public class MouseDragController : Node, IDisposable
 			element.LostMouseCapture -= OnMouseUp;
 		}
 	}
+
+	protected override IEnumerable<Node> Compose() => [];
 }

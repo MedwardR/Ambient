@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Ambient.Backend.Events;
 using Ambient.Backend.Kernel;
-using Ambient.Backend.Management;
+using Ambient.Backend.Threading;
 
 namespace Ambient.Backend.Animation;
 
@@ -45,25 +45,25 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		Looping = true;
 	}
 
-	public void Start() => _running = true;
+	public virtual void Start() => _running = true;
 
-	public void Pause() => _running = false;
+	public virtual void Pause() => _running = false;
 
-	public void Stop()
+	public virtual void Stop()
 	{
 		_running = false;
 		_frameIndex = 0;
 		_frameSeconds = 0f;
 	}
 
-	public void Restart()
+	public virtual void Restart()
 	{
 		_running = true;
 		_frameIndex = 0;
 		_frameSeconds = 0f;
 	}
 
-	public void Add(string animation, KeyFrame<T>[] frames)
+	public virtual void Add(string animation, KeyFrame<T>[] frames)
 	{
 		if (string.IsNullOrWhiteSpace(animation))
 		{
@@ -73,16 +73,17 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		{
 			string trimmed = animation.Trim();
 
+			_animations.Add(trimmed, frames);
+
 			if (_current is null)
 			{
 				UseInternal(trimmed, frames);
 			}
-			_animations.Add(trimmed, frames);
 		}
 		else throw new ArgumentException(ZERO_FRAMES_EX, nameof(frames));
 	}
 
-	public void Use(string animation)
+	public virtual void Use(string animation)
 	{
 		string trimmed = animation.Trim();
 
@@ -96,7 +97,7 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		}
 	}
 
-	protected void UseInternal(string animation, KeyFrame<T>[] frames)
+	protected virtual void UseInternal(string animation, KeyFrame<T>[] frames)
 	{
 		_switched = true;
 		_current = animation;
@@ -107,14 +108,14 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 
 	protected override void Update(float deltaTime, SyncSystem sync)
 	{
-		if (_switched)
-		{
-			_switched = false;
-
-			NotifyFrameChanged(_frames[_frameIndex], sync);
-		}
 		if (_running)
 		{
+			if (_switched)
+			{
+				_switched = false;
+
+				NotifyFrameChanged(_frames[_frameIndex], sync);
+			}
 			_frameSeconds += deltaTime;
 
 			float frameDuration = _frames[_frameIndex].DurationSeconds;
@@ -146,7 +147,7 @@ public class Animator<T> : Node, IReadOnlyDictionary<string, KeyFrame<T>[]>
 		}
 	}
 
-	protected void NotifyFrameChanged(KeyFrame<T> frame, SyncSystem sync)
+	protected virtual void NotifyFrameChanged(KeyFrame<T> frame, SyncSystem sync)
 	{
 		var handler = FrameChanged;
 

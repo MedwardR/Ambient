@@ -1,4 +1,4 @@
-﻿using Ambient.Backend.Management;
+﻿using Ambient.Backend.Threading;
 
 namespace Ambient.Backend.Kernel;
 
@@ -11,9 +11,13 @@ public abstract class Node
 	internal void ComposeInternal()
 	{
 		var children = Compose();
-		var missing = children.Except(Nodes);
 
-		Nodes.AddRange(missing);
+		if (Nodes.Count > 0)
+		{
+			var missing = children.Except(Nodes);
+			Nodes.AddRange(missing);
+		}
+		else Nodes.AddRange(children);
 
 		foreach (var n in children)
 		{

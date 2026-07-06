@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Ambient.Backend.Animation;
-using Ambient.Backend.Management;
-using Ambient.Frontend.WindowsHybrid.Assets;
+using Ambient.Backend.IO;
+using Ambient.Frontend.WindowsHybrid.Sprites;
 
 namespace Ambient.Frontend.WindowsHybrid.Extensions;
 

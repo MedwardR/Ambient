@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Ambient.Frontend.WindowsHybrid.Assets;
 using Ambient.Frontend.WindowsHybrid.Contracts;
+using Ambient.Frontend.WindowsHybrid.Sprites;
 
 namespace Ambient.Frontend.WindowsHybrid.Graphics;
 

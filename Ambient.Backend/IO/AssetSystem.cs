@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Ambient.Backend.Contracts;
 
-namespace Ambient.Backend.Management;
+namespace Ambient.Backend.IO;
 
 public class AssetSystem
 {
@@ -27,12 +27,12 @@ public class AssetSystem
 
 	public byte[] Load(string path)
 	{
-		string key = Resolve(path);
+		string key = Resolve(path).AbsolutePath;
 
 		return _cache.GetOrAdd(key, File.ReadAllBytes);
 	}
 
-	public virtual string Resolve(string relativePath)
+	public virtual Uri Resolve(string relativePath)
 	{
 		string normalized = relativePath.Replace('\\', '/').Trim();
 
@@ -41,7 +41,7 @@ public class AssetSystem
 
 		if (File.Exists(path))
 		{
-			return path;
+			return new(path, UriKind.Absolute);
 		}
 		else throw new FileNotFoundException($"Asset file not found: '{path}'", path);
 	}
